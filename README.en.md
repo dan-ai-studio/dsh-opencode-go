@@ -19,12 +19,20 @@ The plugin automatically adds the session headers required by OpenCode Go, reads
 
 Supported DSH versions: `0.1.5-rc.1`, `0.1.5-rc.2`, `0.1.6-alpha.1`, `0.1.6-alpha.2`, `0.1.7-alpha.1`, `0.1.7-alpha.2`, and `0.1.7-rc.1`.
 
-### Install from GitHub Release (recommended)
+### Install from DSH (recommended)
 
-This plugin is not published to the npm registry, and the DSH Plugins page looks packages up by registry name, so install it with the command below.
+1. Open the **Plugins** page in DSH and click **Add plugin** in the top-right corner.
+2. Enter `@dan-ai-studio/dsh-opencode-go` and click **Install**.
+3. If prompted after installation, click **Enable now**.
+
+Then open **Settings → OpenCode Go**, enter and save your API key, and select an OpenCode Go model in a conversation.
+
+If your DSH version does not have an **Add plugin** entry, use the command-line method below.
+
+### Command-line installation (alternative)
 
 ```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go
 ```
 
 Start or restart `dsh web`, then:
@@ -35,7 +43,15 @@ Start or restart `dsh web`, then:
 
 > On the first install in a profile, pnpm asks you to decide on dependency build scripts (for example `@google/genai` and `protobufjs`). If the install stops with `ERR_PNPM_IGNORED_BUILDS`, set the `allowBuilds` placeholders in the profile's `pnpm-workspace.yaml` to `true` or `false`, then retry the install.
 
-### Build from source (alternative)
+### Install from GitHub Release
+
+For a pinned version, or when the registry is unavailable, install the prebuilt tarball attached to a Release:
+
+```sh
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.14/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+```
+
+### Build from source
 
 Clone the repository and pack it locally:
 
@@ -44,7 +60,7 @@ git clone https://github.com/dan-ai-studio/dsh-opencode-go
 cd dsh-opencode-go
 npm ci --legacy-peer-deps
 npm pack
-dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.14.tgz
 ```
 
 The development dependencies include real test packages from multiple DSH generations, so installation requires `--legacy-peer-deps`. For Headless, replace `web` with `headless`.
@@ -56,7 +72,7 @@ Passing a Git URL straight to `dsh plugin add` (for example `https://github.com/
 Install the plugin into the Headless profile:
 
 ```sh
-dsh plugin --profile headless add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile headless add @dan-ai-studio/dsh-opencode-go
 ```
 
 Save the following as `headless.patch.yml` to select a default model:
@@ -80,24 +96,30 @@ The model ID must be available in the current gateway catalog. Web and Headless 
 
 ### Migrating from the older package
 
-The npm package `dsh-opencode-go` is published by another account and no longer updated; this plugin ships as `@dan-ai-studio/dsh-opencode-go` through GitHub Releases. To migrate:
+The npm package `dsh-opencode-go` is a separate package maintained by another account, unrelated to this repository; this repository publishes `@dan-ai-studio/dsh-opencode-go`. To migrate from the older package:
 
 ```sh
 dsh plugin --profile web remove dsh-opencode-go
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go
 ```
 
 Settings and the API key carry over: both versions use the same settings namespace (`llm-opencode-go`), so nothing needs reconfiguring. For Headless, replace `web` with `headless`; migrate each profile that had the older package.
 
 ## Updating the plugin
 
-Reinstall with the new release's address (it replaces the installed version; the version must support the running DSH — see the compatibility list at the top):
+Update to the newest npm version:
 
 ```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v<version>/dan-ai-studio-dsh-opencode-go-<version>.tgz
+dsh plugin --profile web update @dan-ai-studio/dsh-opencode-go --latest
 ```
 
-Restart `dsh web` and refresh the browser afterwards. For Headless, replace `web` with `headless`; if both profiles have the plugin installed, update each one separately.
+Or install a specific version (it must support the running DSH — see the compatibility list at the top):
+
+```sh
+dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go@<version>
+```
+
+Reinstalling from the new release's GitHub address works too (it replaces the installed version). Restart `dsh web` and refresh the browser afterwards. For Headless, replace `web` with `headless`; if both profiles have the plugin installed, update each one separately.
 
 ## Subscription usage display
 
@@ -135,13 +157,14 @@ This is a boundary case between pnpm's checksum verification and the DSH install
 
 Either of these works:
 
-1. **Download and install by local path (recommended)**: fetch the tarball (browser or `curl -L -O`) and install it by absolute path:
+1. **Install from the registry (recommended)**: `dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go` resolves through the registry and does not hit this path.
+2. **Download and install by local path**: fetch the tarball (browser or `curl -L -O`) and install it by absolute path:
 
    ```sh
-   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
    ```
 
-2. **Install into a fresh profile**: a new profile has no cached copy, so the first resolution downloads the tarball and records its checksum.
+3. **Install into a fresh profile**: a new profile has no cached copy, so the first resolution downloads the tarball and records its checksum.
 
 Deleting the lockfile and reinstalling, or `pnpm install --fix-lockfile`, does not help (the cache still short-circuits resolution).
 

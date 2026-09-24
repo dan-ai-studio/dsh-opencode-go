@@ -20,12 +20,20 @@
 兼容清单：
  `0.1.5-rc.1`、`0.1.5-rc.2`、`0.1.6-alpha.1`、`0.1.6-alpha.2`、`0.1.7-alpha.1`、`0.1.7-alpha.2` 和 `0.1.7-rc.1`
 
-### 从 GitHub Release 安装（推荐）
+### 在 DSH 中安装（推荐）
 
-本插件不发布到 npm registry：DSH 插件页面的「添加插件」按 registry 包名查找，不适用于本插件，请使用下面的命令安装。
+1. 打开 DSH 的 **插件** 页面，点击右上角 **添加插件**。
+2. 输入 `@dan-ai-studio/dsh-opencode-go`，点击 **安装**。
+3. 安装成功后，如果出现 **立即启用**，点击即可。
+
+然后打开 **设置 → OpenCode Go**，填入 API Key 并保存，即可在会话中选择 OpenCode Go 模型。
+
+若当前 DSH 没有「添加插件」入口，可使用下面的命令行方式。
+
+### 命令行安装（备选）
 
 ```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go
 ```
 
 安装后启动或重启 `dsh web`，然后：
@@ -36,7 +44,15 @@ dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/re
 
 > 首次在某个 profile 中安装时，pnpm 会要求先决定依赖的构建脚本（例如 `@google/genai`、`protobufjs`）。如果安装因 `ERR_PNPM_IGNORED_BUILDS` 中断，请把 profile 的 `pnpm-workspace.yaml` 中 `allowBuilds` 的占位值改为 `true` 或 `false`，然后重试安装。
 
-### 源码构建安装（备选）
+### 从 GitHub Release 安装
+
+需要固定版本、或 registry 不可用时，可直接安装 Release 中的预构建包：
+
+```sh
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.14/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+```
+
+### 源码构建
 
 克隆仓库后本地打包安装：
 
@@ -45,7 +61,7 @@ git clone https://github.com/dan-ai-studio/dsh-opencode-go
 cd dsh-opencode-go
 npm ci --legacy-peer-deps
 npm pack
-dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.14.tgz
 ```
 
 开发依赖包含多代 DSH 的真实测试包，安装时需要 `--legacy-peer-deps`。Headless 用户将 `web` 换成 `headless`。
@@ -57,7 +73,7 @@ dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 安装到 Headless profile：
 
 ```sh
-dsh plugin --profile headless add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile headless add @dan-ai-studio/dsh-opencode-go
 ```
 
 将以下内容保存为 `headless.patch.yml`，选择默认模型：
@@ -81,24 +97,30 @@ dsh --profile headless --patch ./headless.patch.yml "你好"
 
 ### 从旧包迁移
 
-npm 上的 `dsh-opencode-go` 由其他账号发布、不再更新；本插件现以 `@dan-ai-studio/dsh-opencode-go` 的名称通过 GitHub Release 分发。迁移：
+npm 上的 `dsh-opencode-go` 是其他账号维护的独立包，与本仓库无关；本仓库的发布名为 `@dan-ai-studio/dsh-opencode-go`。从旧包迁移：
 
 ```sh
 dsh plugin --profile web remove dsh-opencode-go
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go
 ```
 
 设置与 API Key 会保留：新旧版本使用相同的设置命名空间（`llm-opencode-go`），无需重新配置。Headless 用户将 `web` 换成 `headless`；两个 profile 都装过时分别迁移。
 
 ## 升级插件
 
-用新版本的 Release 地址重复安装即可（会替换已安装版本；版本需支持当前 DSH，见顶部兼容清单）：
+更新到 npm 最新版本：
 
 ```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v<版本>/dan-ai-studio-dsh-opencode-go-<版本>.tgz
+dsh plugin --profile web update @dan-ai-studio/dsh-opencode-go --latest
 ```
 
-完成后重启 `dsh web` 并刷新浏览器。Headless 用户将 `web` 换成 `headless`；如果两个 profile 都安装了插件，需要分别升级。
+也可以直接安装指定版本（版本需支持当前 DSH，见顶部兼容清单）：
+
+```sh
+dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go@<版本>
+```
+
+习惯 GitHub Release 的话，用新版本的 Release 地址重复安装同样可以（会替换已装版本）。完成后重启 `dsh web` 并刷新浏览器。Headless 用户将 `web` 换成 `headless`；如果两个 profile 都安装了插件，需要分别升级。
 
 ## 订阅用量显示
 
@@ -136,13 +158,14 @@ modelVisibility:
 
 可用以下任一方式处理：
 
-1. **下载后按本地路径安装（推荐）**：先把 tarball 下载到本地（浏览器或 `curl -L -O`），再用绝对路径安装：
+1. **改用 registry 安装（推荐）**：`dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go` 走 registry 解析，不会遇到该问题。
+2. **下载后按本地路径安装**：先把 tarball 下载到本地（浏览器或 `curl -L -O`），再用绝对路径安装：
 
    ```sh
-   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
+   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
    ```
 
-2. **在全新的 profile 中安装**：新 profile 没有该包的缓存，首次解析会正常下载并写入校验和。
+3. **在全新的 profile 中安装**：新 profile 没有该包的缓存，首次解析会正常下载并写入校验和。
 
 直接删除 lockfile 重装或 `pnpm install --fix-lockfile` 不能解决（缓存仍在）。
 
