@@ -17,7 +17,7 @@ The plugin automatically adds the session headers required by OpenCode Go, reads
 
 ## Installation and usage
 
-Supported DSH versions: `0.1.5-rc.1`, `0.1.5-rc.2`, `0.1.6-alpha.1`, `0.1.6-alpha.2`, `0.1.7-alpha.1`, `0.1.7-alpha.2`, and `0.1.7-rc.1`.
+Supported DSH versions: `0.1.5-rc.1`, `0.1.5-rc.2`, `0.1.6-alpha.1`, `0.1.6-alpha.2`, `0.1.7-alpha.1`, `0.1.7-alpha.2`, `0.1.7-rc.1`, and `0.1.7-rc.2`.
 
 ### Install from DSH (recommended)
 
@@ -48,7 +48,7 @@ Start or restart `dsh web`, then:
 For a pinned version, or when the registry is unavailable, install the prebuilt tarball attached to a Release:
 
 ```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.14/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.15/dan-ai-studio-dsh-opencode-go-0.1.15.tgz
 ```
 
 ### Build from source
@@ -60,7 +60,7 @@ git clone https://github.com/dan-ai-studio/dsh-opencode-go
 cd dsh-opencode-go
 npm ci --legacy-peer-deps
 npm pack
-dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.15.tgz
 ```
 
 The development dependencies include real test packages from multiple DSH generations, so installation requires `--legacy-peer-deps`. For Headless, replace `web` with `headless`.
@@ -161,7 +161,7 @@ Either of these works:
 2. **Download and install by local path**: fetch the tarball (browser or `curl -L -O`) and install it by absolute path:
 
    ```sh
-   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.15.tgz
    ```
 
 3. **Install into a fresh profile**: a new profile has no cached copy, so the first resolution downloads the tarball and records its checksum.

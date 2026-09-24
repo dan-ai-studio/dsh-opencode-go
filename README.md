@@ -18,7 +18,7 @@
 ## 安装与使用
 
 兼容清单：
- `0.1.5-rc.1`、`0.1.5-rc.2`、`0.1.6-alpha.1`、`0.1.6-alpha.2`、`0.1.7-alpha.1`、`0.1.7-alpha.2` 和 `0.1.7-rc.1`
+ `0.1.5-rc.1`、`0.1.5-rc.2`、`0.1.6-alpha.1`、`0.1.6-alpha.2`、`0.1.7-alpha.1`、`0.1.7-alpha.2`、`0.1.7-rc.1` 和 `0.1.7-rc.2`
 
 ### 在 DSH 中安装（推荐）
 
@@ -49,7 +49,7 @@ dsh plugin --profile web add @dan-ai-studio/dsh-opencode-go
 需要固定版本、或 registry 不可用时，可直接安装 Release 中的预构建包：
 
 ```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.14/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.15/dan-ai-studio-dsh-opencode-go-0.1.15.tgz
 ```
 
 ### 源码构建
@@ -61,7 +61,7 @@ git clone https://github.com/dan-ai-studio/dsh-opencode-go
 cd dsh-opencode-go
 npm ci --legacy-peer-deps
 npm pack
-dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.15.tgz
 ```
 
 开发依赖包含多代 DSH 的真实测试包，安装时需要 `--legacy-peer-deps`。Headless 用户将 `web` 换成 `headless`。
@@ -162,7 +162,7 @@ modelVisibility:
 2. **下载后按本地路径安装**：先把 tarball 下载到本地（浏览器或 `curl -L -O`），再用绝对路径安装：
 
    ```sh
-   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.14.tgz
+   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.15.tgz
    ```
 
 3. **在全新的 profile 中安装**：新 profile 没有该包的缓存，首次解析会正常下载并写入校验和。

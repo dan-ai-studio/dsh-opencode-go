@@ -1,5 +1,22 @@
 # Verification
 
+## DSH 0.1.7-rc.2 compatibility (plugin 0.1.15, 2026-09-25)
+
+The package now declares DSH `0.1.7-rc.2` support while retaining the seven previously supported hosts. The declared range ends at `0.1.7-rc.2`; `0.1.7-alpha.3` and `0.1.8-alpha.1` remain outside it as unverified prereleases.
+
+Review of the [upstream release diff](https://github.com/deepseek-ai/deepseek-harness/compare/dsh-v0.1.7-rc.1...dsh-v0.1.7-rc.2) (344 commits) found no required change to the adapter or settings implementation. Peer packages with source changes are `dsh-llm` (additive `projectToolUpdates`, `ToolHistory`, and `ToolUpdate` exports), `dsh-api-remotes` (an added schedule remote and forward entries for `deepseek-account/*`, `credentials/record-updated`, and `schedule/changed`), `dsh-client-ui-model-selection` (internal ModelSelect, catalog, directory, and service rework with unchanged exports), `dsh-client-ui-settings` (two optional `SettingsLauncherOwnerProps` fields), `dsh-client-ui-primitives` (additive MenuSurface, ShortcutKeys, keyboard-composition, focus, and modal-layer exports; removed `OnboardingSurface`, which this plugin does not consume; the consumed `Button`, `Switch`, `Tag`, and icon exports remain), and `dsh-client-locale` (one added key). Every other peer package kept its source unchanged. Cordis stays `4.0.4` and Schemastery `3.18.4`.
+
+The rc.2 release adds five packages (`client/shortcuts`, `client/ui-shortcuts`, `llm/llm-deepseek-account`, `llm/llm-deepseek-api-key`, and `util/code-language`). The rc.2 `dsh-client-ui-primitives` runtime imports `@deepseek-ai/dsh-util-code-language`, so `tests/hosts/v017-rc2` declares it explicitly; without that entry the distributed-client suite fails at import analysis.
+
+Validation on Windows / Node.js 24.20.0 with the published packages:
+
+- Host/Client type checks and the production build pass; `npm pack` builds `dan-ai-studio-dsh-opencode-go-0.1.15.tgz`.
+- All four `0.1.7-rc.2` checks pass against the new `tests/hosts/v017-rc2` fixture: the built artifact loads and streams through the real rc.2 LLM/attachment packages, default and explicit reasoning efforts resolve, profile settings edit without remounting, and the distributed client factory registers against the rc.2 store and primitives.
+- The full suite passes: **303 tests in 22 files**.
+- The tarball installs into a real Web profile that runs the `dsh-v0.1.7-rc.2` source checkout: `dsh plugin --profile web add ...0.1.15.tgz` resolves 97 packages without a compatibility refusal, `dsh plugin --profile web list` shows `@dan-ai-studio/dsh-opencode-go@0.1.15`, and `--dump-config` composes the bundle's `opencode-go` route.
+
+Not covered: live OpenCode Go calls, browser/Desktop rendering of this revision, and macOS or Linux reruns. The profile install references the local tarball path; registry installation requires the 0.1.15 publication.
+
 ## DSH 0.1.7-rc.1 compatibility (plugin 0.1.12, 2026-09-24)
 
 The package now declares DSH `0.1.7-rc.1` support while retaining the six previously supported hosts. Unverified prereleases stay outside the range: `0.1.7-rc.2` and `0.1.8-alpha.1` are still rejected. This release is driven by an upstream mechanism change: DSH `0.1.7-rc.1` is the first version that enforces declared DSH peer ranges during installation and profile startup ([#4980](https://github.com/deepseek-ai/deepseek-harness/pull/4980), [#5061](https://github.com/deepseek-ai/deepseek-harness/pull/5061)). The previous declared range ended at `0.1.7-alpha.2`, so the plugin manager refused the install before pnpm ran. `engines.dsh` remains declarative; the peer ranges carry the enforcement.
