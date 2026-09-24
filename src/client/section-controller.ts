@@ -196,11 +196,13 @@ export class OpencodeGoSectionController {
         booleanField('enabled'),
         textField('apiKeyEnv'),
         textField('baseURL'),
-        numberField('refreshMinutes'),
-        numberField('streamIdleTimeoutMs'),
-        numberField('maxRequestImageBytes'),
-        numberField('requestImagePixelBudget'),
-        numberField('requestImageMaxBytes'),
+        // Bounds mirror the Host schema; a draft outside them stays visually
+        // invalid instead of failing only when the save reaches the Host.
+        numberField('refreshMinutes', { min: 1, max: 7 * 24 * 60, integer: true }),
+        numberField('streamIdleTimeoutMs', { min: 1, integer: true }),
+        numberField('maxRequestImageBytes', { min: 1, integer: true }),
+        numberField('requestImagePixelBudget', { min: 1, integer: true }),
+        numberField('requestImageMaxBytes', { min: 1, integer: true }),
         jsonField('modelLimits'),
       ],
       [{ field: API_KEY_FIELD, write: text => this.writeKey(text) }],

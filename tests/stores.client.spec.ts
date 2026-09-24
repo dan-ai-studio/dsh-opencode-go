@@ -184,6 +184,24 @@ describe('StagedForm', () => {
     expect(form.shell()).toEqual(settled)
   })
 
+  it('recovers from a rejected write without stranding the form in saving', async () => {
+    const host = stubSettingsScope<OpencodeGoSettings>()
+    const form = new StagedForm(host.scope as never, specs)
+    setSpy(host).mockImplementation(() => Promise.reject(new Error('transport down')))
+    host.publish({ status: 'ready', writable: true, value: {}, user: {} })
+
+    form.actions().edit('baseURL', 'https://down.test/v1')
+    await form.save()
+
+    // The rejection must settle the save, keep the draft, and report failure.
+    expect(form.shell()).toEqual({ available: true, writable: true, dirty: true, invalid: false, saving: false, failed: true })
+
+    // Once the transport recovers, the kept draft can save.
+    acceptWrites(host)
+    await form.save()
+    expect(form.shell()).toEqual(settled)
+  })
+
   it('does not start a second save while one is in flight and drops empty discards', async () => {
     const host = stubSettingsScope<OpencodeGoSettings>()
     const form = new StagedForm(host.scope as never, specs)
@@ -317,6 +335,32 @@ describe('jsonField', () => {
     await form.save()
 
     expect(form.shell()).toEqual(settled)
+  })
+})
+
+describe('numberField bounds', () => {
+  const spec = numberField('refreshMinutes', { min: 1, max: 10_080, integer: true })
+
+  it('accepts in-range whole numbers, clears on empty, and blocks out-of-range drafts', () => {
+    expect(spec.parse('60')).toEqual({ kind: 'set', value: 60 })
+    expect(spec.parse('')).toEqual({ kind: 'clear' })
+    expect(spec.parse('-1')).toBeUndefined()
+    expect(spec.parse('0')).toBeUndefined()
+    expect(spec.parse('1.5')).toBeUndefined()
+    expect(spec.parse('999999')).toBeUndefined()
+  })
+
+  it('marks an out-of-range draft invalid through the shared form', () => {
+    const host = stubSettingsScope<OpencodeGoSettings>()
+    const form = new StagedForm(host.scope as never, [spec])
+    host.publish({ status: 'ready', writable: true, value: { refreshMinutes: 60 }, user: {} })
+
+    form.actions().edit('refreshMinutes', '-1')
+    expect(form.field('refreshMinutes')).toEqual(field('-1', { overridden: false, invalid: true }))
+    expect(form.shell().invalid).toBe(true)
+
+    form.actions().edit('refreshMinutes', '120')
+    expect(form.field('refreshMinutes')).toEqual(field('120', { overridden: true, invalid: false }))
   })
 })
 

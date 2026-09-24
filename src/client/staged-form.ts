@@ -111,13 +111,25 @@ interface PlannedWrite {
   run: (() => Promise<boolean>) | undefined
 }
 
+/** Draft bounds a number field enforces before a save, mirroring the Host schema. */
+export interface NumberFieldBounds {
+  /** Smallest accepted value, inclusive. */
+  min?: number
+  /** Largest accepted value, inclusive. */
+  max?: number
+  /** Require a whole number. */
+  integer?: boolean
+}
+
 /**
  * A whole-number field. An empty draft clears the field; any other draft that
- * is not a finite number blocks the save.
+ * is not a finite number, or falls outside the declared bounds, blocks the save
+ * instead of reaching the Host and failing there.
  * @param field - field name inside the namespace section.
+ * @param bounds - optional range and whole-number constraints.
  * @returns the field's conversion spec.
  */
-export function numberField(field: string): FieldSpec {
+export function numberField(field: string, bounds: NumberFieldBounds = {}): FieldSpec {
   return {
     field,
     format: value => typeof value === 'number' ? String(value) : '',
@@ -125,7 +137,11 @@ export function numberField(field: string): FieldSpec {
       const trimmed = text.trim()
       if (trimmed === '') return { kind: 'clear' }
       const parsed = Number(trimmed)
-      return Number.isFinite(parsed) ? { kind: 'set', value: parsed } : undefined
+      if (!Number.isFinite(parsed)) return undefined
+      if (bounds.integer === true && !Number.isSafeInteger(parsed)) return undefined
+      if (bounds.min !== undefined && parsed < bounds.min) return undefined
+      if (bounds.max !== undefined && parsed > bounds.max) return undefined
+      return { kind: 'set', value: parsed }
     },
   }
 }
@@ -316,13 +332,21 @@ export class StagedForm {
     this.failed = false
     this.publish()
     let landed = true
-    for (const write of writes) {
-      landed = await write() && landed
+    try {
+      for (const write of writes) {
+        landed = await write() && landed
+      }
+    } catch {
+      // A rejected write (transport fault, refused credential) must settle the
+      // save: the drafts stay for correction instead of stranding the form in
+      // `saving`, which would disable every control until a reload.
+      landed = false
+    } finally {
+      if (landed) this.staged.clear()
+      this.saving = false
+      this.failed = !landed
+      this.publish()
     }
-    if (landed) this.staged.clear()
-    this.saving = false
-    this.failed = !landed
-    this.publish()
   }
 
   /**

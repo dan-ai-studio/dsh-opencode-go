@@ -190,6 +190,38 @@ describe('llm-opencode-go plugin mount', () => {
     expect(chunks.find(chunk => chunk.type === 'finish')).toMatchObject({ reason: { kind: 'stop' } })
   })
 
+  it('ignores a credential answer for a reference that is no longer configured', async () => {
+    const ctx = new Context()
+    await ctx.plugin(LlmRuntime)
+    const calls: Array<{ ref: string; resolve: (answer: { configured: boolean; writable: boolean }) => void }> = []
+    ctx.provide('credentials', {
+      describe: (ref: string) => new Promise((resolve) => { calls.push({ ref, resolve: resolve as never }) }),
+      resolve: () => Promise.resolve(undefined),
+    } as never)
+    let apiKeyEnv = 'KEY_A'
+    const fields = ['enabled', 'modelVisibility', 'apiKeyEnv', 'baseURL', 'refreshMinutes', 'streamIdleTimeoutMs',
+      'maxRequestImageBytes', 'requestImagePixelBudget', 'requestImageMaxBytes', 'modelLimits'] as const
+    const config = Object.fromEntries(fields.map(key => [key, {
+      get: () => configOf('https://opencode.ai/zen/go/v1', { apiKeyEnv })[key],
+    }])) as never
+    apply(ctx, config)
+    await vi.waitFor(() => { expect(calls.some(call => call.ref === 'KEY_A')).toBe(true) })
+
+    // The configured reference changes before the first answer arrives.
+    apiKeyEnv = 'KEY_B'
+    ctx.emit('loader/volatile-update', [])
+    await vi.waitFor(() => { expect(calls.some(call => call.ref === 'KEY_B')).toBe(true) })
+
+    // The new reference registers the route...
+    calls.find(call => call.ref === 'KEY_B')!.resolve({ configured: true, writable: true })
+    await vi.waitFor(() => { expect(ctx.llm.listProviders()).toHaveLength(1) })
+
+    // ...and the stale answer for the previous reference must not withdraw it.
+    for (const call of calls.filter(item => item.ref === 'KEY_A')) call.resolve({ configured: false, writable: true })
+    await new Promise(resolve => setTimeout(resolve, 20))
+    expect(ctx.llm.listProviders()).toHaveLength(1)
+  })
+
   it('keeps unconfigured live ids visible with an explicit diagnostic', async () => {
     vi.stubEnv('OPENCODE_API_KEY', 'test-key')
     const gateway = await mockGateway({

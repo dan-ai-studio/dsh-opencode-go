@@ -176,12 +176,16 @@ export function apply(ctx: Context, raw?: OpencodeGoConfig | LiveConfig): void {
       registration?.replace([PROVIDER_ID])
     }
     const credentials = ctx.get('credentials')
+    const ref = current().apiKeyEnv
     if (credentials === undefined) {
-      applyRoute(launchEnvironmentOf(ctx).get(current().apiKeyEnv)?.value !== undefined)
+      applyRoute(launchEnvironmentOf(ctx).get(ref)?.value !== undefined)
       return
     }
-    void credentials.describe(credentialRef(current().apiKeyEnv))
-      .then((info) => { applyRoute(info.configured) })
+    void credentials.describe(credentialRef(ref))
+      .then((info) => {
+        // A describe answer applies only while it still answers for the reference in force.
+        if (ref === current().apiKeyEnv) applyRoute(info.configured)
+      })
       .catch((error: unknown) => {
         ctx.logger.error(`llm-opencode-go: credential describe failed; keeping the previous route state (${String(error)})`)
       })
