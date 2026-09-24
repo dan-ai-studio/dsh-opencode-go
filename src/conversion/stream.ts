@@ -5,7 +5,7 @@
  * raw JSON representation. pi-ai also reports failures as terminal stream
  * events, which this module maps into Harness finish chunks.
  *
- * @module dsh-opencode-go/conversion/stream
+ * @module @dan-ai-studio/dsh-opencode-go/conversion/stream
  */
 
 import { brandString } from '@deepseek-ai/dsh-brand'

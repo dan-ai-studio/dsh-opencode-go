@@ -8,7 +8,7 @@ import { once } from 'node:events'
 
 const consumer = resolve(process.argv[2] ?? '.')
 const require = createRequire(resolve(consumer, 'package.json'))
-const entry = require.resolve('dsh-opencode-go')
+const entry = require.resolve('@dan-ai-studio/dsh-opencode-go')
 const fromPlugin = createRequire(entry)
 const load = id => import(pathToFileURL(fromPlugin.resolve(id)).href)
 const { Context } = await load('@deepseek-ai/cordis')
@@ -42,7 +42,7 @@ try {
   await ctx.plugin(Loader)
   await ctx.loader.create({ name: '@deepseek-ai/dsh-llm' })
   const adapterId = await ctx.loader.create({
-    name: 'dsh-opencode-go',
+    name: '@dan-ai-studio/dsh-opencode-go',
     config: { apiKeyEnv: 'OPENCODE_GO_INSTALL_TEST_KEY', baseURL: `http://127.0.0.1:${server.address().port}`, streamIdleTimeoutMs: 5000 },
   })
   await ctx.loader.await()

@@ -34,7 +34,7 @@ it.each([
     runInNewContext(readFileSync('lib/client.js', 'utf8'), {
       document, window: { __ModuleLoader__: { load: (entry: typeof registration) => { registration = entry } } },
     })
-    expect(registration?.id).toBe('dsh-opencode-go')
+    expect(registration?.id).toBe('@dan-ai-studio/dsh-opencode-go')
     const client = registration!.factory(id => {
       if (!table.has(id)) throw new Error(`Unprovided module: ${id}`)
       return table.get(id)
@@ -98,7 +98,7 @@ it.each([
     } finally {
       preview.remove()
     }
-    expect(document.querySelector('style[data-plugin="dsh-opencode-go"]')).not.toBeNull()
+    expect(document.querySelector('style[data-plugin="@dan-ai-studio/dsh-opencode-go"]')).not.toBeNull()
     for (const dispose of effects.reverse()) (await dispose)()
     expect(sharedForm.listenerCount()).toBe(0)
   } finally {

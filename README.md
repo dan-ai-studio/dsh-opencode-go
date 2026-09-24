@@ -1,4 +1,4 @@
-# dsh-opencode-go
+# @dan-ai-studio/dsh-opencode-go
 
 [English](README.en.md)
 
@@ -20,25 +20,13 @@
 兼容清单：
  `0.1.5-rc.1`、`0.1.5-rc.2`、`0.1.6-alpha.1`、`0.1.6-alpha.2`、`0.1.7-alpha.1`、`0.1.7-alpha.2` 和 `0.1.7-rc.1`
 
-### 在 DSH 中安装（推荐）
+### 从 GitHub Release 安装（推荐）
 
-1. 打开 DSH 的 **插件** 页面，点击右上角 **添加插件**。
-2. 输入 `dsh-opencode-go`，点击 **安装**。
-3. 安装成功后，如果出现 **立即启用**，点击即可。
-
-![在 DSH 插件页添加、安装并启用 dsh-opencode-go](docs/assets/install-via-dsh.gif)
-
-然后打开 **设置 → OpenCode Go**，填入 API Key 并保存，即可在会话中选择 OpenCode Go 模型。
-
-若当前 DSH 没有「添加插件」入口，可使用下面的命令行方式。
-
-### 命令行安装（备选）
+本插件不发布到 npm registry：DSH 插件页面的「添加插件」按 registry 包名查找，不适用于本插件，请使用下面的命令安装。
 
 ```sh
-dsh plugin --profile web add dsh-opencode-go
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
-
-> 支持 DSH `0.1.7-rc.1` 需要插件 `0.1.12` 及以上；如果安装被 DSH 的兼容性检查拒绝，或 npm 上尚未发布该版本，请改用下文的 **从 GitHub 安装**。
 
 安装后启动或重启 `dsh web`，然后：
 
@@ -48,24 +36,16 @@ dsh plugin --profile web add dsh-opencode-go
 
 > 首次在某个 profile 中安装时，pnpm 会要求先决定依赖的构建脚本（例如 `@google/genai`、`protobufjs`）。如果安装因 `ERR_PNPM_IGNORED_BUILDS` 中断，请把 profile 的 `pnpm-workspace.yaml` 中 `allowBuilds` 的占位值改为 `true` 或 `false`，然后重试安装。
 
-### 从 GitHub 安装
+### 源码构建安装（备选）
 
-> 日常安装请使用上面的 npm 版本；以下方式用于 npm 尚未发布、或需要固定到某个提交时。
-
-**预构建包（推荐）**：安装 Release 中附带的 tarball，无需在本机构建：
-
-```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.12/dsh-opencode-go-0.1.12.tgz
-```
-
-**源码构建**：克隆仓库后本地打包安装：
+克隆仓库后本地打包安装：
 
 ```sh
 git clone https://github.com/dan-ai-studio/dsh-opencode-go
 cd dsh-opencode-go
 npm ci --legacy-peer-deps
 npm pack
-dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
+dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
 
 开发依赖包含多代 DSH 的真实测试包，安装时需要 `--legacy-peer-deps`。Headless 用户将 `web` 换成 `headless`。
@@ -77,7 +57,7 @@ dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
 安装到 Headless profile：
 
 ```sh
-dsh plugin --profile headless add dsh-opencode-go
+dsh plugin --profile headless add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
 
 将以下内容保存为 `headless.patch.yml`，选择默认模型：
@@ -99,15 +79,26 @@ dsh --profile headless --patch ./headless.patch.yml "你好"
 
 模型 ID 须在当前网关目录中可用。Web 和 Headless 使用各自的 profile，需要分别安装插件。
 
-## 升级插件
+### 从旧包迁移
 
-更新 Web profile 中的插件到 npm 最新版本：
+npm 上的 `dsh-opencode-go` 由其他账号发布、不再更新；本插件现以 `@dan-ai-studio/dsh-opencode-go` 的名称通过 GitHub Release 分发。迁移：
 
 ```sh
-dsh plugin --profile web update dsh-opencode-go --latest
+dsh plugin --profile web remove dsh-opencode-go
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
 
-完成后重启 `dsh web` 并刷新浏览器。`--latest` 取 npm 最新版；也可以直接 `dsh plugin --profile web add dsh-opencode-go@<版本>` 安装指定版本，版本需支持当前 DSH（见顶部兼容清单）。Headless 用户将 `web` 换成 `headless`；如果两个 profile 都安装了插件，需要分别升级。
+设置与 API Key 会保留：新旧版本使用相同的设置命名空间（`llm-opencode-go`），无需重新配置。Headless 用户将 `web` 换成 `headless`；两个 profile 都装过时分别迁移。
+
+## 升级插件
+
+用新版本的 Release 地址重复安装即可（会替换已安装版本；版本需支持当前 DSH，见顶部兼容清单）：
+
+```sh
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v<版本>/dan-ai-studio-dsh-opencode-go-<版本>.tgz
+```
+
+完成后重启 `dsh web` 并刷新浏览器。Headless 用户将 `web` 换成 `headless`；如果两个 profile 都安装了插件，需要分别升级。
 
 ## 订阅用量显示
 
@@ -148,12 +139,12 @@ modelVisibility:
 1. **下载后按本地路径安装（推荐）**：先把 tarball 下载到本地（浏览器或 `curl -L -O`），再用绝对路径安装：
 
    ```sh
-   dsh plugin --profile web add /absolute/path/to/dsh-opencode-go-0.1.12.tgz
+   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
    ```
 
 2. **在全新的 profile 中安装**：新 profile 没有该包的缓存，首次解析会正常下载并写入校验和。
 
-直接删除 lockfile 重装或 `pnpm install --fix-lockfile` 不能解决（缓存仍在）；npm 安装方式不受影响。
+直接删除 lockfile 重装或 `pnpm install --fix-lockfile` 不能解决（缓存仍在）。
 
 ### 安装日志出现 `missing peer` 警告
 
@@ -181,12 +172,12 @@ modelVisibility:
 
 ## 卸载
 
-在 DSH 的 **插件** 页面找到 `dsh-opencode-go`，点击 **卸载** 并确认，然后重启 `dsh web`（或 Desktop）并刷新页面。没有热更新能力的 profile（例如 Headless）请使用命令行：
+在 DSH 的 **插件** 页面找到 `@dan-ai-studio/dsh-opencode-go`，点击 **卸载** 并确认，然后重启 `dsh web`（或 Desktop）并刷新页面。没有热更新能力的 profile（例如 Headless）请使用命令行：
 
 ```sh
-dsh plugin --profile web remove dsh-opencode-go
+dsh plugin --profile web remove @dan-ai-studio/dsh-opencode-go
 # 或
-dsh plugin --profile headless remove dsh-opencode-go
+dsh plugin --profile headless remove @dan-ai-studio/dsh-opencode-go
 ```
 
 说明：

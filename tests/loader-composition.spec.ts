@@ -37,7 +37,7 @@ afterEach(async () => {
 
 /** Boot the given composition rows through the Loader and require every row to mount. */
 async function loadComposition(lines: readonly string[]): Promise<Context> {
-  root = await mkdtemp(join(tmpdir(), 'dsh-opencode-go-loader-'))
+  root = await mkdtemp(join(tmpdir(), 'dan-ai-studio-dsh-opencode-go-loader-'))
   const configPath = join(root, 'cordis.yml')
   await writeFile(configPath, [...lines, ''].join('\n'))
   const ctx = new Context()
@@ -48,7 +48,7 @@ async function loadComposition(lines: readonly string[]): Promise<Context> {
   const modules = new Map<string, unknown>([
     ['@deepseek-ai/dsh-llm', LlmRuntime],
     ['@deepseek-ai/dsh-credentials-local', LocalCredentialProvider],
-    ['dsh-opencode-go', OpencodeGo],
+    ['@dan-ai-studio/dsh-opencode-go', OpencodeGo],
   ])
   ctx.loader.internal = {
     version: 'v2',
@@ -75,7 +75,7 @@ describe('llm-opencode-go through a real Loader composition', () => {
     const gateway = await mockGateway({ status: 200, body: listingBody(fullLiveListing()) })
     const ctx = await loadComposition([
       "- name: '@deepseek-ai/dsh-llm'",
-      "- name: 'dsh-opencode-go'",
+      "- name: '@dan-ai-studio/dsh-opencode-go'",
       '  config:',
       `    baseURL: ${gateway.url}`,
       '    modelLimits:',
@@ -104,7 +104,7 @@ describe('llm-opencode-go through a real Loader composition', () => {
     gateway.pushCompletions({ events: textEvents })
     const ctx = await loadComposition([
       "- name: '@deepseek-ai/dsh-llm'",
-      "- name: 'dsh-opencode-go'",
+      "- name: '@dan-ai-studio/dsh-opencode-go'",
       '  config:',
       `    baseURL: ${gateway.url}`,
     ])
@@ -137,7 +137,7 @@ describe('llm-opencode-go through a real Loader composition', () => {
 
   it('registers the route when the credentials seam becomes active after the plugin', async () => {
     const gateway = await mockGateway({ status: 200, body: listingBody(fullLiveListing()) })
-    const credDir = await mkdtemp(join(tmpdir(), 'dsh-opencode-go-cred-'))
+    const credDir = await mkdtemp(join(tmpdir(), 'dan-ai-studio-dsh-opencode-go-cred-'))
     tempDirs.push(credDir)
     const credPath = join(credDir, '.credentials.yaml')
     await writeFile(credPath, 'version: 1\nrefs:\n  OPENCODE_API_KEY: loader-key\n', { mode: 0o600 })
@@ -147,7 +147,7 @@ describe('llm-opencode-go through a real Loader composition', () => {
     // at boot, not only at the next credentials write.
     const ctx = await loadComposition([
       "- name: '@deepseek-ai/dsh-llm'",
-      "- name: 'dsh-opencode-go'",
+      "- name: '@dan-ai-studio/dsh-opencode-go'",
       '  config:',
       `    baseURL: ${gateway.url}`,
       "- name: '@deepseek-ai/dsh-credentials-local'",

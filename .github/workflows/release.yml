@@ -1,16 +1,14 @@
 name: Release
 
 # Publishing is tag-driven: land the version commit, then push a `v<version>`
-# tag. The workflow refuses a tag that does not match package.json.
+# tag. The workflow refuses a tag that does not match package.json, runs the
+# host matrix, and attaches the built tarball to a GitHub Release — that
+# tarball is what `dsh plugin add` installs.
 on:
   push:
     tags: ['v*']
 
-# Trusted Publishing exchanges this workflow's OIDC token for npm publish
-# rights, so no long-lived npm token is stored; contents:write creates the
-# GitHub Release with the built tarball.
 permissions:
-  id-token: write
   contents: write
 
 concurrency:
@@ -25,10 +23,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
-          cache: npm
-      # Trusted Publishing needs npm >= 11.5.1.
-      - run: npm install -g npm@latest
+          # Release builds deliberately carry no dependency cache.
       - run: npm ci --legacy-peer-deps --ignore-scripts
       - name: Verify the tag matches the package version
         run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
@@ -36,9 +31,6 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm pack
-      # `--provenance` records the build origin. To use a granular npm token
-      # instead of Trusted Publishing, set NODE_AUTH_TOKEN from a secret.
-      - run: npm publish dsh-opencode-go-*.tgz --provenance
-      - run: gh release create "$GITHUB_REF_NAME" dsh-opencode-go-*.tgz --generate-notes
+      - run: gh release create "$GITHUB_REF_NAME" *.tgz --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}

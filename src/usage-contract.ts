@@ -52,14 +52,14 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
 
 // Released DSH uses schema; current source builds use a lazy create() codec.
 const usageCodec = {
-  mode: 'strict' as const, typeSymbol: 'dsh-opencode-go#GoUsage',
+  mode: 'strict' as const, typeSymbol: '@dan-ai-studio/dsh-opencode-go#GoUsage',
   schema: { parse: parseGoUsage }, create: () => ({ parse: parseGoUsage }),
 }
 
 export const usageRemote: TypertRemoteContribution = {
-  package: 'dsh-opencode-go',
+  package: '@dan-ai-studio/dsh-opencode-go',
   descriptors: [{
-    id: 'dsh-opencode-go#opencodeGoUsage/read',
+    id: '@dan-ai-studio/dsh-opencode-go#opencodeGoUsage/read',
     service: 'opencodeGoUsage', namespace: 'opencodeGoUsage', method: 'read',
     invocation: { kind: 'direct' }, parameters: [],
     result: usageCodec,

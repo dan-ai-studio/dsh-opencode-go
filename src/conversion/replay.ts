@@ -5,7 +5,7 @@
  * module stores only the provider-native metadata needed to reconstruct a
  * pi-ai assistant message on a later request.
  *
- * @module dsh-opencode-go/conversion/replay
+ * @module @dan-ai-studio/dsh-opencode-go/conversion/replay
  */
 
 import { LlmError } from '@deepseek-ai/dsh-llm'

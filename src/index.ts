@@ -13,7 +13,7 @@
  *
  * ```yaml
  * - id: llm-opencode-go
- *   name: 'dsh-opencode-go'
+ *   name: '@dan-ai-studio/dsh-opencode-go'
  *   config:
  *     enabled: true                     # false withdraws the route; the plugin stays mounted
  *     apiKeyEnv: OPENCODE_API_KEY       # default
@@ -28,7 +28,7 @@
  * the refusal is logged with the reason and everything else this plugin does
  * still works.
  *
- * @module dsh-opencode-go
+ * @module @dan-ai-studio/dsh-opencode-go
  */
 
 import type { Context } from '@deepseek-ai/cordis'

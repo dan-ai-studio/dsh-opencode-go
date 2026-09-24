@@ -1,7 +1,7 @@
 /**
  * Harness request-history conversion into pi-ai's Context vocabulary.
  *
- * @module dsh-opencode-go/conversion/context
+ * @module @dan-ai-studio/dsh-opencode-go/conversion/context
  */
 
 import { brandString } from '@deepseek-ai/dsh-brand'

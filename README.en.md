@@ -1,4 +1,4 @@
-# dsh-opencode-go
+# @dan-ai-studio/dsh-opencode-go
 
 [中文](README.md)
 
@@ -19,25 +19,13 @@ The plugin automatically adds the session headers required by OpenCode Go, reads
 
 Supported DSH versions: `0.1.5-rc.1`, `0.1.5-rc.2`, `0.1.6-alpha.1`, `0.1.6-alpha.2`, `0.1.7-alpha.1`, `0.1.7-alpha.2`, and `0.1.7-rc.1`.
 
-### Install from DSH (recommended)
+### Install from GitHub Release (recommended)
 
-1. Open the **Plugins** page in DSH and click **Add plugin** in the top-right corner.
-2. Enter `dsh-opencode-go` and click **Install**.
-3. If prompted after installation, click **Enable now**.
-
-![Add, install, and enable dsh-opencode-go from DSH (Chinese UI)](docs/assets/install-via-dsh.gif)
-
-Then open **Settings → OpenCode Go**, enter and save your API key, and select an OpenCode Go model in a conversation.
-
-If your DSH version does not have an **Add plugin** entry, use the command-line method below.
-
-### Command-line installation (alternative)
+This plugin is not published to the npm registry, and the DSH Plugins page looks packages up by registry name, so install it with the command below.
 
 ```sh
-dsh plugin --profile web add dsh-opencode-go
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
-
-> DSH `0.1.7-rc.1` support requires plugin `0.1.12` or later. If the install is refused by DSH's compatibility check, or npm does not have that version yet, use **Install from GitHub** below instead.
 
 Start or restart `dsh web`, then:
 
@@ -47,24 +35,16 @@ Start or restart `dsh web`, then:
 
 > On the first install in a profile, pnpm asks you to decide on dependency build scripts (for example `@google/genai` and `protobufjs`). If the install stops with `ERR_PNPM_IGNORED_BUILDS`, set the `allowBuilds` placeholders in the profile's `pnpm-workspace.yaml` to `true` or `false`, then retry the install.
 
-### Install from GitHub
+### Build from source (alternative)
 
-> Everyday installs use the npm version above; use these when a version is not on npm yet or you need a pinned commit.
-
-**Prebuilt package (recommended)**: install the tarball attached to a Release; nothing is built locally:
-
-```sh
-dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.12/dsh-opencode-go-0.1.12.tgz
-```
-
-**Build from source**: clone the repository and pack it locally:
+Clone the repository and pack it locally:
 
 ```sh
 git clone https://github.com/dan-ai-studio/dsh-opencode-go
 cd dsh-opencode-go
 npm ci --legacy-peer-deps
 npm pack
-dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
+dsh plugin --profile web add ./dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
 
 The development dependencies include real test packages from multiple DSH generations, so installation requires `--legacy-peer-deps`. For Headless, replace `web` with `headless`.
@@ -76,7 +56,7 @@ Passing a Git URL straight to `dsh plugin add` (for example `https://github.com/
 Install the plugin into the Headless profile:
 
 ```sh
-dsh plugin --profile headless add dsh-opencode-go
+dsh plugin --profile headless add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
 
 Save the following as `headless.patch.yml` to select a default model:
@@ -98,15 +78,26 @@ dsh --profile headless --patch ./headless.patch.yml "Hello"
 
 The model ID must be available in the current gateway catalog. Web and Headless use separate profiles, so install the plugin in each profile you use.
 
-## Updating the plugin
+### Migrating from the older package
 
-Update the plugin in the Web profile to the latest npm version:
+The npm package `dsh-opencode-go` is published by another account and no longer updated; this plugin ships as `@dan-ai-studio/dsh-opencode-go` through GitHub Releases. To migrate:
 
 ```sh
-dsh plugin --profile web update dsh-opencode-go --latest
+dsh plugin --profile web remove dsh-opencode-go
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.13/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
 ```
 
-Restart `dsh web` and refresh the browser afterwards. `--latest` takes the newest npm version; `dsh plugin --profile web add dsh-opencode-go@<version>` installs a specific version, which must support the running DSH (see the compatibility list at the top). For Headless, replace `web` with `headless`; if both profiles have the plugin installed, update each one separately.
+Settings and the API key carry over: both versions use the same settings namespace (`llm-opencode-go`), so nothing needs reconfiguring. For Headless, replace `web` with `headless`; migrate each profile that had the older package.
+
+## Updating the plugin
+
+Reinstall with the new release's address (it replaces the installed version; the version must support the running DSH — see the compatibility list at the top):
+
+```sh
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v<version>/dan-ai-studio-dsh-opencode-go-<version>.tgz
+```
+
+Restart `dsh web` and refresh the browser afterwards. For Headless, replace `web` with `headless`; if both profiles have the plugin installed, update each one separately.
 
 ## Subscription usage display
 
@@ -147,12 +138,12 @@ Either of these works:
 1. **Download and install by local path (recommended)**: fetch the tarball (browser or `curl -L -O`) and install it by absolute path:
 
    ```sh
-   dsh plugin --profile web add /absolute/path/to/dsh-opencode-go-0.1.12.tgz
+   dsh plugin --profile web add /absolute/path/to/dan-ai-studio-dsh-opencode-go-0.1.13.tgz
    ```
 
 2. **Install into a fresh profile**: a new profile has no cached copy, so the first resolution downloads the tarball and records its checksum.
 
-Deleting the lockfile and reinstalling, or `pnpm install --fix-lockfile`, does not help (the cache still short-circuits resolution); npm installs are unaffected.
+Deleting the lockfile and reinstalling, or `pnpm install --fix-lockfile`, does not help (the cache still short-circuits resolution).
 
 ### `missing peer` warnings in the install log
 
@@ -180,12 +171,12 @@ If the online configuration is temporarily unavailable, the plugin prefers a con
 
 ## Uninstall
 
-In DSH's **Plugins** page, find `dsh-opencode-go`, click **Uninstall**, and confirm; then restart `dsh web` (or Desktop) and reload the page. Profiles without hot reloading (Headless, for example) must use the command line:
+In DSH's **Plugins** page, find `@dan-ai-studio/dsh-opencode-go`, click **Uninstall**, and confirm; then restart `dsh web` (or Desktop) and reload the page. Profiles without hot reloading (Headless, for example) must use the command line:
 
 ```sh
-dsh plugin --profile web remove dsh-opencode-go
+dsh plugin --profile web remove @dan-ai-studio/dsh-opencode-go
 # or
-dsh plugin --profile headless remove dsh-opencode-go
+dsh plugin --profile headless remove @dan-ai-studio/dsh-opencode-go
 ```
 
 Notes:

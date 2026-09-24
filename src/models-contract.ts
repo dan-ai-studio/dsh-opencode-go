@@ -82,10 +82,10 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
     opencodeGoModels: { read(): Promise<RemoteResult<GoModelCatalog>> }
   }
 }
-const codec = { mode: 'strict' as const, typeSymbol: 'dsh-opencode-go#GoModelCatalog',
+const codec = { mode: 'strict' as const, typeSymbol: '@dan-ai-studio/dsh-opencode-go#GoModelCatalog',
   schema: { parse: parseGoModelCatalog }, create: () => ({ parse: parseGoModelCatalog }) }
 export const modelsRemote: TypertRemoteContribution = {
-  package: 'dsh-opencode-go',
-  descriptors: [{ id: 'dsh-opencode-go#opencodeGoModels/read', service: 'opencodeGoModels',
+  package: '@dan-ai-studio/dsh-opencode-go',
+  descriptors: [{ id: '@dan-ai-studio/dsh-opencode-go#opencodeGoModels/read', service: 'opencodeGoModels',
     namespace: 'opencodeGoModels', method: 'read', invocation: { kind: 'direct' }, parameters: [], result: codec }],
 }
