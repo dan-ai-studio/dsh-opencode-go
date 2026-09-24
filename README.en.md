@@ -43,6 +43,30 @@ Start or restart `dsh web`, then:
 2. Enter and save your OpenCode Go API key.
 3. Select an OpenCode Go model from the conversation model picker.
 
+### Install from GitHub
+
+> Everyday installs use the npm version above; use these when a version is not on npm yet or you need a pinned commit.
+
+**Prebuilt package (recommended)**: install the tarball attached to a Release; nothing is built locally:
+
+```sh
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.12/dsh-opencode-go-0.1.12.tgz
+```
+
+**Build from source**: clone the repository and pack it locally:
+
+```sh
+git clone https://github.com/dan-ai-studio/dsh-opencode-go
+cd dsh-opencode-go
+npm ci --legacy-peer-deps
+npm pack
+dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
+```
+
+The development dependencies include real test packages from multiple DSH generations, so installation requires `--legacy-peer-deps`. For Headless, replace `web` with `headless`.
+
+Passing a Git URL straight to `dsh plugin add` (for example `https://github.com/dan-ai-studio/dsh-opencode-go`) installs the entire development dependency tree on your machine and builds through pnpm; that tree is large and needs legacy peer resolution, so it is not the recommended path.
+
 ### Headless
 
 Install the plugin into the Headless profile:
@@ -69,16 +93,6 @@ dsh --profile headless --patch ./headless.patch.yml "Hello"
 ```
 
 The model ID must be available in the current gateway catalog. Web and Headless use separate profiles, so install the plugin in each profile you use.
-
-To build from source and install a local package:
-
-```sh
-npm ci --legacy-peer-deps
-npm pack
-dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
-```
-
-The development dependencies include real test packages from multiple DSH generations, so installation requires `--legacy-peer-deps`. For Headless, replace `web` with `headless`.
 
 ## Updating the plugin
 

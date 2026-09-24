@@ -44,6 +44,30 @@ dsh plugin --profile web add dsh-opencode-go@0.1.11
 2. 填入 OpenCode Go API Key 并保存。
 3. 在会话的模型选择器中选择 OpenCode Go 模型。
 
+### 从 GitHub 安装
+
+> 日常安装请使用上面的 npm 版本；以下方式用于 npm 尚未发布、或需要固定到某个提交时。
+
+**预构建包（推荐）**：安装 Release 中附带的 tarball，无需在本机构建：
+
+```sh
+dsh plugin --profile web add https://github.com/dan-ai-studio/dsh-opencode-go/releases/download/v0.1.12/dsh-opencode-go-0.1.12.tgz
+```
+
+**源码构建**：克隆仓库后本地打包安装：
+
+```sh
+git clone https://github.com/dan-ai-studio/dsh-opencode-go
+cd dsh-opencode-go
+npm ci --legacy-peer-deps
+npm pack
+dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
+```
+
+开发依赖包含多代 DSH 的真实测试包，安装时需要 `--legacy-peer-deps`。Headless 用户将 `web` 换成 `headless`。
+
+直接把 Git 地址交给 `dsh plugin add`（例如 `https://github.com/dan-ai-studio/dsh-opencode-go`）会在本机安装完整的开发依赖树并由 pnpm 构建；该依赖树体积大且需要 legacy peer 解析，因此不作为推荐方式。
+
 ### 无头模式
 
 安装到 Headless profile：
@@ -70,16 +94,6 @@ dsh --profile headless --patch ./headless.patch.yml "你好"
 ```
 
 模型 ID 须在当前网关目录中可用。Web 和 Headless 使用各自的 profile，需要分别安装插件。
-
-如需从源码构建并安装本地包：
-
-```sh
-npm ci --legacy-peer-deps
-npm pack
-dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
-```
-
-开发依赖包含多代 DSH 的真实测试包，安装时需要 `--legacy-peer-deps`。Headless 用户将 `web` 换成 `headless`。
 
 ## 升级插件
 
