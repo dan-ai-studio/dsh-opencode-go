@@ -44,6 +44,8 @@ dsh plugin --profile web add dsh-opencode-go@0.1.11
 2. 填入 OpenCode Go API Key 并保存。
 3. 在会话的模型选择器中选择 OpenCode Go 模型。
 
+> 首次在某个 profile 中安装时，pnpm 会要求先决定依赖的构建脚本（例如 `@google/genai`、`protobufjs`）。如果安装因 `ERR_PNPM_IGNORED_BUILDS` 中断，请把 profile 的 `pnpm-workspace.yaml` 中 `allowBuilds` 的占位值改为 `true` 或 `false`，然后重试安装。
+
 ### 从 GitHub 安装
 
 > 日常安装请使用上面的 npm 版本；以下方式用于 npm 尚未发布、或需要固定到某个提交时。

@@ -43,6 +43,8 @@ Start or restart `dsh web`, then:
 2. Enter and save your OpenCode Go API key.
 3. Select an OpenCode Go model from the conversation model picker.
 
+> On the first install in a profile, pnpm asks you to decide on dependency build scripts (for example `@google/genai` and `protobufjs`). If the install stops with `ERR_PNPM_IGNORED_BUILDS`, set the `allowBuilds` placeholders in the profile's `pnpm-workspace.yaml` to `true` or `false`, then retry the install.
+
 ### Install from GitHub
 
 > Everyday installs use the npm version above; use these when a version is not on npm yet or you need a pinned commit.

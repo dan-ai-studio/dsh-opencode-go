@@ -12,6 +12,7 @@ Validation on Windows / Node.js 24.20.0 with the published packages:
 - All four `0.1.7-rc.1` checks pass against the new `tests/hosts/v017-rc1` fixture: the built artifact loads and streams through the real rc.1 LLM/attachment packages, default and explicit reasoning efforts resolve, profile settings edit without remounting, and the distributed client factory registers against the rc.1 store and primitives.
 - The full suite passes: **294 tests in 22 files**. `tests/host-compatibility.spec.ts` now allows 60s per fixture subprocess and 90s per test; the previous 12s limit failed intermittently on cold concurrent Windows runs while the same fixtures passed when executed directly. No failure involved `0.1.7-rc.1` behavior.
 - The tarball installs into a real Web profile that runs the `dsh-v0.1.7-rc.1` source checkout: `dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz` resolves 97 packages, `dsh plugin --profile web list` shows `dsh-opencode-go@0.1.12`, and `--dump-config` composes the bundle's `opencode-go` route without a compatibility refusal.
+- The published `v0.1.12` GitHub Release tarball installs into an isolated profile the same way. The first attempt stops on pnpm's build-policy decision for `@google/genai` and `protobufjs`, and the install succeeds once the profile's `allowBuilds` values are chosen.
 
 Not covered: live OpenCode Go calls, browser/Desktop rendering of this revision, and macOS or Linux reruns. The profile install references the local tarball path; registry installation requires the 0.1.12 publication.
 
