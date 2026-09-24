@@ -6,11 +6,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Duskriver/dsh-opencode-go.git"
+    "url": "git+https://github.com/dan-ai-studio/dsh-opencode-go.git"
   },
-  "homepage": "https://github.com/Duskriver/dsh-opencode-go#readme",
+  "homepage": "https://github.com/dan-ai-studio/dsh-opencode-go#readme",
   "bugs": {
-    "url": "https://github.com/Duskriver/dsh-opencode-go/issues"
+    "url": "https://github.com/dan-ai-studio/dsh-opencode-go/issues"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",
@@ -54,6 +54,7 @@
     "build": "node scripts/build.mjs",
     "typecheck": "tsc -p tsconfig.host.json --noEmit && tsc -p tsconfig.client.json --noEmit",
     "test": "vitest run",
+    "prepare": "npm run build",
     "prepack": "npm run build",
     "pretest": "npm run build",
     "verify:installed": "node --expose-internals scripts/installed-smoke.mjs",
