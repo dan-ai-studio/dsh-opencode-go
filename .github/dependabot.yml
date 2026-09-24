@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Actions only: the npm development dependencies deliberately pin several DSH
+  # host generations for the compatibility matrix, so automated npm bumps would
+  # break the fixtures. Update those by hand.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
