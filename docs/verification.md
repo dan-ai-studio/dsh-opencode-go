@@ -1,5 +1,20 @@
 # Verification
 
+## DSH 0.1.7-rc.1 compatibility (plugin 0.1.12, 2026-09-24)
+
+The package now declares DSH `0.1.7-rc.1` support while retaining the six previously supported hosts. Unverified prereleases stay outside the range: `0.1.7-rc.2` and `0.1.8-alpha.1` are still rejected. This release is driven by an upstream mechanism change: DSH `0.1.7-rc.1` is the first version that enforces declared DSH peer ranges during installation and profile startup ([#4980](https://github.com/deepseek-ai/deepseek-harness/pull/4980), [#5061](https://github.com/deepseek-ai/deepseek-harness/pull/5061)). The previous declared range ended at `0.1.7-alpha.2`, so the plugin manager refused the install before pnpm ran. `engines.dsh` remains declarative; the peer ranges carry the enforcement.
+
+Review of the [upstream release diff](https://github.com/deepseek-ai/deepseek-harness/compare/dsh-v0.1.7-alpha.2...dsh-v0.1.7-rc.1) (156 commits) found no required change to the adapter or settings implementation. Peer packages with source changes are `dsh-api-remotes` (one added type re-export), `dsh-api-gateway` (internal stream-cancellation rework), `dsh-client-ui-primitives` (additive exports; the consumed `Button`, `Switch`, `Tag`, and icon exports remain), `dsh-client-ui-model-selection` (focus and mouse interaction), and `dsh-client-ui-conversation` (an additive `PreparingToolCall`/`StartedToolCall` split this plugin does not consume). Every other peer package kept its source unchanged. Cordis stays `4.0.4` and Schemastery `3.18.4`.
+
+Validation on Windows / Node.js 24.20.0 with the published packages:
+
+- Host/Client type checks and the production build pass; `npm pack` builds `dsh-opencode-go-0.1.12.tgz`.
+- All four `0.1.7-rc.1` checks pass against the new `tests/hosts/v017-rc1` fixture: the built artifact loads and streams through the real rc.1 LLM/attachment packages, default and explicit reasoning efforts resolve, profile settings edit without remounting, and the distributed client factory registers against the rc.1 store and primitives.
+- The full suite passes: **294 tests in 22 files**. `tests/host-compatibility.spec.ts` now allows 60s per fixture subprocess and 90s per test; the previous 12s limit failed intermittently on cold concurrent Windows runs while the same fixtures passed when executed directly. No failure involved `0.1.7-rc.1` behavior.
+- The tarball installs into a real Web profile that runs the `dsh-v0.1.7-rc.1` source checkout: `dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz` resolves 97 packages, `dsh plugin --profile web list` shows `dsh-opencode-go@0.1.12`, and `--dump-config` composes the bundle's `opencode-go` route without a compatibility refusal.
+
+Not covered: live OpenCode Go calls, browser/Desktop rendering of this revision, and macOS or Linux reruns. The profile install references the local tarball path; registry installation requires the 0.1.12 publication.
+
 ## Individual model switches and cached Settings discovery (2026-09-23)
 
 `modelVisibility` stores explicit booleans by model ID. An absent override enables an ordinary model and disables a model marked deprecated. A `true` override can enable a deprecated model without a second global condition; `false` can hide an ordinary model. The Host and Client share `isModelEnabled`, including own-property checks for IDs that match JavaScript prototype keys. Older `showDeprecatedModels` and `visibleModelIds` fields remain loadable as unknown configuration but no longer impose a visibility condition.
