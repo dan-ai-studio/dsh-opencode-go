@@ -35,8 +35,10 @@
 ### 命令行安装（备选）
 
 ```sh
-dsh plugin --profile web add dsh-opencode-go@0.1.11
+dsh plugin --profile web add dsh-opencode-go
 ```
+
+> 支持 DSH `0.1.7-rc.1` 需要插件 `0.1.12` 及以上；如果安装被 DSH 的兼容性检查拒绝，或 npm 上尚未发布该版本，请改用下文的 **从 GitHub 安装**。
 
 安装后启动或重启 `dsh web`，然后：
 
@@ -75,7 +77,7 @@ dsh plugin --profile web add ./dsh-opencode-go-0.1.12.tgz
 安装到 Headless profile：
 
 ```sh
-dsh plugin --profile headless add dsh-opencode-go@0.1.11
+dsh plugin --profile headless add dsh-opencode-go
 ```
 
 将以下内容保存为 `headless.patch.yml`，选择默认模型：
@@ -105,7 +107,7 @@ dsh --profile headless --patch ./headless.patch.yml "你好"
 dsh plugin --profile web update dsh-opencode-go --latest
 ```
 
-完成后重启 `dsh web` 并刷新浏览器。Headless 用户将 `web` 换成 `headless`；如果两个 profile 都安装了插件，需要分别升级。
+完成后重启 `dsh web` 并刷新浏览器。`--latest` 取 npm 最新版；也可以直接 `dsh plugin --profile web add dsh-opencode-go@<版本>` 安装指定版本，版本需支持当前 DSH（见顶部兼容清单）。Headless 用户将 `web` 换成 `headless`；如果两个 profile 都安装了插件，需要分别升级。
 
 ## 订阅用量显示
 
@@ -137,6 +139,26 @@ modelVisibility:
 
 ## 常见问题
 
+### 安装或重装时报 `ERR_PNPM_MISSING_TARBALL_INTEGRITY`
+
+这是 pnpm 校验和与 dsh 安装流程的边界情况，不是包损坏：pnpm 要求远程 tarball 依赖在 lockfile 中带有校验和，但当本机缓存里已有同一份包时，解析不会重新下载，也就不会补写校验和；随后 dsh 的安装校验会拒绝它。从本地包切换到远程包、或重装到另一个 tarball 来源时可能出现。
+
+可用以下任一方式处理：
+
+1. **下载后按本地路径安装（推荐）**：先把 tarball 下载到本地（浏览器或 `curl -L -O`），再用绝对路径安装：
+
+   ```sh
+   dsh plugin --profile web add /absolute/path/to/dsh-opencode-go-0.1.12.tgz
+   ```
+
+2. **在全新的 profile 中安装**：新 profile 没有该包的缓存，首次解析会正常下载并写入校验和。
+
+直接删除 lockfile 重装或 `pnpm install --fix-lockfile` 不能解决（缓存仍在）；npm 安装方式不受影响。
+
+### 安装日志出现 `missing peer` 警告
+
+`pnpm peers check` 或安装日志中的 `missing peer @deepseek-ai/cordis`、`missing peer @deepseek-ai/dsh-*` 是预期现象：这些 DSH 服务包由 Harness 运行时按自身版本提供，不从 profile 的 `node_modules` 解析，profile 也有意关闭了 `autoInstallPeers`。不需要为此开启 `autoInstallPeers` 或手动安装这些包。
+
 ### 提示 `opencode-go` 路由已被占用
 
 同一 profile 中只能有一个适配器提供 `opencode-go` 路由。如果已经通过其他插件或通用 pi-ai 配置接入 OpenCode Go，请先停用那一项配置。其他提供方可以继续使用。
@@ -159,13 +181,19 @@ modelVisibility:
 
 ## 卸载
 
-从对应 profile 移除插件，再重启应用：
+在 DSH 的 **插件** 页面找到 `dsh-opencode-go`，点击 **卸载** 并确认，然后重启 `dsh web`（或 Desktop）并刷新页面。没有热更新能力的 profile（例如 Headless）请使用命令行：
 
 ```sh
 dsh plugin --profile web remove dsh-opencode-go
 # 或
 dsh plugin --profile headless remove dsh-opencode-go
 ```
+
+说明：
+
+- 卸载会移除插件、`opencode-go` 路由及其模型；**API Key 保留在 profile 的凭证存储中**，不会随插件删除。需要一并清除时，请在卸载前于设置页或通过 DSH 的凭证工具处理。
+- Web 和 Headless 使用各自的 profile；需要全部卸载时请分别操作。
+- 重启应用后，插件页面不再显示该项。
 
 ## 反馈
 

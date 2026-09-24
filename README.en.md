@@ -34,8 +34,10 @@ If your DSH version does not have an **Add plugin** entry, use the command-line 
 ### Command-line installation (alternative)
 
 ```sh
-dsh plugin --profile web add dsh-opencode-go@0.1.11
+dsh plugin --profile web add dsh-opencode-go
 ```
+
+> DSH `0.1.7-rc.1` support requires plugin `0.1.12` or later. If the install is refused by DSH's compatibility check, or npm does not have that version yet, use **Install from GitHub** below instead.
 
 Start or restart `dsh web`, then:
 
@@ -74,7 +76,7 @@ Passing a Git URL straight to `dsh plugin add` (for example `https://github.com/
 Install the plugin into the Headless profile:
 
 ```sh
-dsh plugin --profile headless add dsh-opencode-go@0.1.11
+dsh plugin --profile headless add dsh-opencode-go
 ```
 
 Save the following as `headless.patch.yml` to select a default model:
@@ -104,7 +106,7 @@ Update the plugin in the Web profile to the latest npm version:
 dsh plugin --profile web update dsh-opencode-go --latest
 ```
 
-Restart `dsh web` and refresh the browser afterwards. For Headless, replace `web` with `headless`; if both profiles have the plugin installed, update each one separately.
+Restart `dsh web` and refresh the browser afterwards. `--latest` takes the newest npm version; `dsh plugin --profile web add dsh-opencode-go@<version>` installs a specific version, which must support the running DSH (see the compatibility list at the top). For Headless, replace `web` with `headless`; if both profiles have the plugin installed, update each one separately.
 
 ## Subscription usage display
 
@@ -136,6 +138,26 @@ The older `showDeprecatedModels` and `visibleModelIds` fields no longer control 
 
 ## FAQ
 
+### `ERR_PNPM_MISSING_TARBALL_INTEGRITY` on install or reinstall
+
+This is a boundary case between pnpm's checksum verification and the DSH install flow, not a damaged package: pnpm requires a checksum for remote tarball dependencies in the lockfile, but when the same package is already in the local cache, resolution does not download it again and therefore never writes that checksum; the subsequent install check then refuses it. It can appear when switching from a local package to a remote one, or when reinstalling from a different tarball source.
+
+Either of these works:
+
+1. **Download and install by local path (recommended)**: fetch the tarball (browser or `curl -L -O`) and install it by absolute path:
+
+   ```sh
+   dsh plugin --profile web add /absolute/path/to/dsh-opencode-go-0.1.12.tgz
+   ```
+
+2. **Install into a fresh profile**: a new profile has no cached copy, so the first resolution downloads the tarball and records its checksum.
+
+Deleting the lockfile and reinstalling, or `pnpm install --fix-lockfile`, does not help (the cache still short-circuits resolution); npm installs are unaffected.
+
+### `missing peer` warnings in the install log
+
+`missing peer @deepseek-ai/cordis` / `missing peer @deepseek-ai/dsh-*` from `pnpm peers check` or the install log are expected: the host supplies these DSH service packages from its own runtime, they are not resolved from the profile's `node_modules`, and profiles intentionally disable `autoInstallPeers`. Do not enable `autoInstallPeers` or install these packages manually.
+
 ### The `opencode-go` route is already in use
 
 Only one adapter in a profile can provide the `opencode-go` route. If another plugin or a generic pi-ai configuration already connects OpenCode Go, disable that configuration first. Other providers can continue to run.
@@ -158,13 +180,19 @@ If the online configuration is temporarily unavailable, the plugin prefers a con
 
 ## Uninstall
 
-Remove the plugin from the relevant profile and restart the application:
+In DSH's **Plugins** page, find `dsh-opencode-go`, click **Uninstall**, and confirm; then restart `dsh web` (or Desktop) and reload the page. Profiles without hot reloading (Headless, for example) must use the command line:
 
 ```sh
 dsh plugin --profile web remove dsh-opencode-go
 # or
 dsh plugin --profile headless remove dsh-opencode-go
 ```
+
+Notes:
+
+- Uninstalling removes the plugin, the `opencode-go` route, and its models. The **API key stays in the profile's credential store**; remove it from Settings (or with DSH's credential tools) before uninstalling if you want it gone.
+- Web and Headless use separate profiles; uninstall in each profile you used.
+- After a restart the Plugins page no longer lists the entry.
 
 ## Feedback
 
